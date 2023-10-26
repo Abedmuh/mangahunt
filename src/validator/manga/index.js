@@ -1,13 +1,13 @@
 const InvariantError = require('../../exceptions/InvariantError');
-const { NotePayloadSchema } = require('./schema');
+const { MangaPayloadSchema } = require('./schema');
 
-const NotesValidator = {
-  validateNotePayload: (payload) => {
-    const validationResult = NotePayloadSchema.validate(payload);
+const MangaValidator = {
+  validateMangaPayload: (payload) => {
+    const validationResult = MangaPayloadSchema.validate(payload);
     if (validationResult.error) {
       throw new InvariantError(validationResult.error.message);
     }
   },
 };
 
-module.exports = NotesValidator;
+module.exports = MangaValidator;

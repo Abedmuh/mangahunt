@@ -5,19 +5,17 @@ const NotFoundError = require('../exceptions/NotFoundError');
 const AuthorizationError = require('../exceptions/AuthorizationError');
 const { mapDBToModel } = require('../utils');
 
-class NotesService {
+class MangasService {
   constructor() {
     this._pool = new Pool();
   }
 
-  async addNote({ title, body, tags, owner }) {
+  async addManga({ title, author, tags, studios, premiered, license }) {
     const id = nanoid(16);
-    const createdAt = new Date().toISOString();
-    const updatedAt = createdAt;
 
     const query = {
-      text: 'INSERT INTO notes VALUES($1, $2, $3, $4, $5, $6, $7) RETURNING id',
-      values: [id, title, body, tags, createdAt, updatedAt, owner],
+      text: 'INSERT INTO manga VALUES($1, $2, $3, $4, $5, $6, $7) RETURNING id',
+      values: [id, title, author, tags, studios, premiered, license],
     };
 
     const result = await this._pool.query(query);
@@ -29,34 +27,24 @@ class NotesService {
     return result.rows[0].id;
   }
 
-  async getNotes(owner) {
+  async getMangaById(id) {
     const query = {
-      text: 'SELECT * FROM notes WHERE owner = $1',
-      values: [owner],
-    };
-    const result = await this._pool.query(query);
-    return result.rows.map(mapDBToModel);
-  }
-
-  async getNoteById(id) {
-    const query = {
-      text: 'SELECT * FROM notes WHERE id = $1',
+      text: 'SELECT * FROM manga WHERE id = $1',
       values: [id],
     };
     const result = await this._pool.query(query);
 
     if (!result.rows.length) {
-      throw new NotFoundError('Catatan tidak ditemukan');
+      throw new NotFoundError('Manga tidak ditemukan');
     }
 
     return result.rows.map(mapDBToModel)[0];
   }
 
-  async editNoteById(id, { title, body, tags }) {
-    const updatedAt = new Date().toISOString();
+  async editMangaById(id, { title, author, tags }) {
     const query = {
-      text: 'UPDATE notes SET title = $1, body = $2, tags = $3, updated_at = $4 WHERE id = $5 RETURNING id',
-      values: [title, body, tags, updatedAt, id],
+      text: 'UPDATE manga SET title = $1, author = $2, tags = $3, studios = $4, premiered = $5, license = $6 WHERE id = $7 RETURNING id',
+      values: [title, author, tags, studios, premiered, license, id],
     };
 
     const result = await this._pool.query(query);
@@ -66,9 +54,9 @@ class NotesService {
     }
   }
 
-  async deleteNoteById(id) {
+  async deleteMangaById(id) {
     const query = {
-      text: 'DELETE FROM notes WHERE id = $1 RETURNING id',
+      text: 'DELETE FROM manga WHERE id = $1 RETURNING id',
       values: [id],
     };
 
@@ -79,20 +67,20 @@ class NotesService {
     }
   }
 
-  async verifyNoteOwner(id, owner) {
+  async verifyMangaOwner(id, owner) {
     const query = {
-      text: 'SELECT * FROM notes WHERE id = $1',
+      text: 'SELECT * FROM manga WHERE id = $1',
       values: [id],
     };
     const result = await this._pool.query(query);
     if (!result.rows.length) {
       throw new NotFoundError('Catatan tidak ditemukan');
     }
-    const note = result.rows[0];
-    if (note.owner !== owner) {
+    const manga = result.rows[0];
+    if (manga.owner !== owner) {
       throw new AuthorizationError('Anda tidak berhak mengakses resource ini');
     }
   }
 }
 
-module.exports = NotesService;
+module.exports = MangasService;

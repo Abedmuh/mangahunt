@@ -1,40 +1,32 @@
 const routes = (handler) => [
   {
     method: 'POST',
-    path: '/notes',
-    handler: handler.postNoteHandler,
+    path: '/mangas',
+    handler: handler.postMangaHandler,
     options: {
       auth: 'notesapp_jwt',
     },
   },
   {
     method: 'GET',
-    path: '/notes',
-    handler: handler.getNotesHandler,
-    options: {
-      auth: 'notesapp_jwt',
-    },
-  },
-  {
-    method: 'GET',
-    path: '/notes/{id}',
-    handler: handler.getNoteByIdHandler,
+    path: '/mangas/{id}',
+    handler: handler.getMangaByIdHandler,
     options: {
       auth: 'notesapp_jwt',
     },
   },
   {
     method: 'PUT',
-    path: '/notes/{id}',
-    handler: handler.putNoteByIdHandler,
+    path: '/mangas/{id}',
+    handler: handler.putMangaByIdHandler,
     options: {
       auth: 'notesapp_jwt',
     },
   },
   {
     method: 'DELETE',
-    path: '/notes/{id}',
-    handler: handler.deleteNoteByIdHandler,
+    path: '/mangas/{id}',
+    handler: handler.deleteMangaByIdHandler,
     options: {
       auth: 'notesapp_jwt',
     },

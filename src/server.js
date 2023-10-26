@@ -6,7 +6,7 @@ const Jwt = require('@hapi/jwt');
 
 // notes
 const mangas = require('./api/manga');
-const MangaService = require('./services/NotesService');
+const MangaService = require('./services/MangasService');
 const MangaValidator = require('./validator/manga');
 
 // users

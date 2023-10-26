@@ -1,32 +1,44 @@
 const ClientError = require('../../exceptions/ClientError');
 
-class NotesHandler {
+class MangaHandler {
   constructor(service, validator) {
     this._service = service;
     this._validator = validator;
 
-    this.postNoteHandler = this.postNoteHandler.bind(this);
-    this.getNotesHandler = this.getNotesHandler.bind(this);
-    this.getNoteByIdHandler = this.getNoteByIdHandler.bind(this);
-    this.putNoteByIdHandler = this.putNoteByIdHandler.bind(this);
-    this.deleteNoteByIdHandler = this.deleteNoteByIdHandler.bind(this);
+    this.postMangaHandler = this.postMangaHandler.bind(this);
+    this.getMangaByIdHandler = this.getMangaByIdHandler.bind(this);
+    this.putMangaByIdHandler = this.putMangaByIdHandler.bind(this);
+    this.deleteMangaByIdHandler = this.deleteMangaByIdHandler.bind(this);
   }
 
-  async postNoteHandler(request, h) {
+  async postMangaHandler(request, h) {
     try {
-      this._validator.validateNotePayload(request.payload);
-      const { title = 'untitled', body, tags } = request.payload;
+      this._validator.validateMangaPayload(request.payload);
+      const {
+        title = 'untitled',
+        author,
+        tags,
+        studios,
+        premiered,
+        license,
+      } = request.payload;
       const { id: credentialId } = request.auth.credentials;
 
-      const noteId = await this._service.addNote({
-        title, body, tags, owner: credentialId,
+      const mangaId = await this._service.addManga({
+        title,
+        author,
+        tags,
+        studios,
+        premiered,
+        license,
+        owner: credentialId,
       });
 
       const response = h.response({
         status: 'success',
         message: 'Catatan berhasil ditambahkan',
         data: {
-          noteId,
+          mangaId,
         },
       });
       response.code(201);
@@ -52,28 +64,17 @@ class NotesHandler {
     }
   }
 
-  async getNotesHandler(request) {
-    const { id: credentialId } = request.auth.credentials;
-    const notes = await this._service.getNotes(credentialId);
-    return {
-      status: 'success',
-      data: {
-        notes,
-      },
-    };
-  }
-
-  async getNoteByIdHandler(request, h) {
+  async getMangaByIdHandler(request, h) {
     try {
       const { id } = request.params;
       const { id: credentialId } = request.auth.credentials;
 
-      await this._service.verifyNoteOwner(id, credentialId);
-      const note = await this._service.getNoteById(id);
+      await this._service.verifyMangaOwner(id, credentialId);
+      const manga = await this._service.getMangaById(id);
       return {
         status: 'success',
         data: {
-          note,
+          manga,
         },
       };
     } catch (error) {
@@ -97,13 +98,14 @@ class NotesHandler {
     }
   }
 
-  async putNoteByIdHandler(request, h) {
+  async putMangaByIdHandler(request, h) {
     try {
-      this._validator.validateNotePayload(request.payload);
-      const { id } = request.params; const { id: credentialId } = request.auth.credentials;
+      this._validator.validateMangaPayload(request.payload);
+      const { id } = request.params;
+      const { id: credentialId } = request.auth.credentials;
 
-      await this._service.verifyNoteOwner(id, credentialId);
-      await this._service.editNoteById(id, request.payload);
+      await this._service.verifyMangaOwner(id, credentialId);
+      await this._service.editMangaById(id, request.payload);
 
       return {
         status: 'success',
@@ -130,13 +132,13 @@ class NotesHandler {
     }
   }
 
-  async deleteNoteByIdHandler(request, h) {
+  async deleteMangaByIdHandler(request, h) {
     try {
       const { id } = request.params;
       const { id: credentialId } = request.auth.credentials;
 
-      await this._service.verifyNoteOwner(id, credentialId);
-      await this._service.deleteNoteById(id);
+      await this._service.verifyMangaOwner(id, credentialId);
+      await this._service.deleteMangaById(id);
 
       return {
         status: 'success',
@@ -164,4 +166,4 @@ class NotesHandler {
   }
 }
 
-module.exports = NotesHandler;
+module.exports = MangaHandler;
